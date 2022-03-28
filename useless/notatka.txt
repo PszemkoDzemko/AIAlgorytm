@@ -1,0 +1,5 @@
+czasami podczas zamiany skad stary ma nieprawidlowych graczy ale ma prawidlowy overall i cene
+gracze sa juz z nowego teamu
+
+w zapisanym pliku po zamianach sklady ktore byly podmieniane maja graczy z ostaniego nowo utworzonego zespolu 
+ale wlasciwy overall i cene  :( idk why  
