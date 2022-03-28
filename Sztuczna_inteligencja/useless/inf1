@@ -1,0 +1,113 @@
+import java.awt.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args)
+
+        throws FileNotFoundException,
+                IOException {
+
+            int  HMS=10, budget=1000000, equal=0, sumPrice=0, iteracja=0;
+            List<Team> HM = new ArrayList<Team>();
+
+            String nazwa =  "randomdata.csv";
+            Player[]  players = new Player[6];
+            String[] parts = new String[4];
+
+            System.out.println("Getting random line from file: " + nazwa);
+
+            InputStream is = null;
+            BufferedReader reader = null;
+            try {
+                is = new FileInputStream(nazwa);
+
+                reader = new BufferedReader(new InputStreamReader(
+                        new FileInputStream(nazwa)));
+
+                System.out.println("Reading file...");
+                List<String> list = new ArrayList<String>();
+                String line = reader.readLine();
+                while (line != null) {
+                    list.add(line);
+                    line = reader.readLine();
+                }
+                is.close();
+                reader.close();
+
+                System.out.println("Generating random...");
+                SecureRandom random = new SecureRandom();
+                int row;
+
+                for (int j = 0; j < HMS; j++) {
+                    System.out.println("-----------------Team = "+j+" ----------------");
+                    do {
+                        sumPrice  = 0;
+                        for (int i=0; i<6; i++){
+                            //System.out.println("sumPrice = "+sumPrice);
+
+                            iteracja++;
+
+                            do {
+
+                                row = random.nextInt(list.size());
+                                for (Player  player:players) {
+                                    if (player !=  null){
+                                        if (row == player.id) {
+                                            equal = 1;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }while (equal == 1);
+
+                            parts  = list.get(row).split(";");
+                            //System.out.println("parts  lenght = "+parts.length);
+                            if (parts.length==0)System.out.println(row);
+
+                            sumPrice=sumPrice+ Integer.parseInt(parts[3]);
+
+                            players[i] = new Player(Integer.parseInt(parts[0]),parts[1],Integer.parseInt(parts[2]),Integer.parseInt(parts[3]));
+
+                        }
+
+
+
+                    }while (sumPrice>budget);
+                    System.out.println(iteracja+" Cena: "+sumPrice);
+                    Team team= new Team(players);
+                    int sum=0;
+                    for (Player player : players){
+                        System.out.println(player.toString());
+                        sum=sum+ player.price;
+                    }
+                    System.out.println(sum);
+
+
+                    //System.out.println("Random selection is:\n");
+                    //System.out.println(list.get(row));
+
+                    HM.add(team);
+
+                }
+
+
+
+
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
+                if (reader != null) {
+                    reader.close();
+                }
+            }
+        }
+    }
