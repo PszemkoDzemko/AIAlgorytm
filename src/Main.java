@@ -6,21 +6,53 @@ import java.util.List;
 import java.util.Random;
 
 public class Main {
+    public static ArrayList<Player> playersList = new ArrayList<>();
+    static Random r=new Random();
+
     public static void main(String[] args) throws IOException {
 
-        int  HMS=10, budget=1000000, HMCR=70, NI=50, r1,r2;
-        double sum=0, som;
-        Random r=new Random();
+        int  HMS=10, budget=1000000, HMCR=30, NI=1000050, r1,r2,same=0;
+
         ArrayList<Team> HM = new ArrayList<Team>();
+        //ArrayList<Player> players = new ArrayList<>();
         Player[] newPlayers = new Player[6];
         Team newTeam;
+
+        String[] parts = new String[4];
+        Player tempPlayer = null;
+        String nazwa =  "randomdata.csv";
+        InputStream is = null;
+        BufferedReader reader = null;
+
+        try {
+            is = new FileInputStream(nazwa);
+
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(nazwa)));
+            //System.out.println("Reading file...");
+            String line = reader.readLine();
+            while (line != null) {
+                parts = line.split(";");
+                tempPlayer = new Player(Integer.parseInt(parts[0]), parts[1], Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
+                playersList.add(tempPlayer);
+                line = reader.readLine();
+            }
+            is.close();
+            reader.close();
+        }finally {
+                if (is != null) {
+                    is.close();
+                }
+                if (reader != null) {
+                    reader.close();
+                }
+        }
 
         for (int j = 1; j < (HMS+1); j++) {
 
             HM.add(generateTeam(budget));
         }
 
-        //saveTeams(HM,"teamsR1.csv");
+        saveTeams(HM,"teamsR1.csv");
         //  Nowe i jak lepsze wymieniamy:
 
         for (int i = 0; i < NI; i++) {
@@ -42,10 +74,19 @@ public class Main {
             }else {
                 newTeam = generateTeam(budget);
             }
+            same=0;
             for (int j = 0; j < HMS; j++) {
-                if (HM.get(j).overall < newTeam.overall){
-                    HM.set(j,newTeam);
-                    break;
+                for (int k = 0; k < 6; k++) {
+                    if(HM.get(j).getPlayers()[k]==newTeam.getPlayers()[k]){
+                        same++;
+//                        System.out.println("same"+same);
+                    }
+                }
+                if (same<6){
+                    if (HM.get(j).overall < newTeam.overall){
+                        HM.set(j,newTeam);
+                        break;
+                    }
                 }
             }
         }
@@ -57,15 +98,10 @@ public class Main {
     public static Team generateTeam(int budget) throws IOException {
 
         int  equal=0, sumPrice=0, iteracja=0;
-
-        String nazwa =  "randomdata.csv";
+        Player tempPlayer = null;
         Player[]  players = new Player[6];
-        String[] parts = new String[4];
 
 
-        Random random = new Random();
-        RandomAccessFile randomAccessFile = new RandomAccessFile(nazwa,"r");
-        //System.out.println("------------  Team ------------");
         do {
             //System.out.println("szukam jeszcze raz ... ");
             sumPrice  = 0;
@@ -76,40 +112,17 @@ public class Main {
 
                 do {
                     equal=0;
-                    randomAccessFile.seek(random.nextInt((int) randomAccessFile.length()-62));
-                    int ch;
-                    do {
-                        ch = randomAccessFile.read();
-                    }while (ch != '\n');
-//                        for (Player  player:players) {
-//                            if (player !=  null){
-//                                if (randomAccessFile.getFilePointer() == player.id) {
-//                                    equal = 1;
-//                                    break;
-//                                }
-//                            }
-//                        }
-                    //                    if (randomAccessFile.readLine() ==  null) {  equal=1;  }
-//                    else
-                        parts  = randomAccessFile.readLine().split(";");
+                    tempPlayer = playersList.get(r.nextInt(playersList.size()));
                     for (Player player:players) {
                         if (player != null){
-                            if (Integer.parseInt(parts[0])==player.id){
+                            if (tempPlayer.id==player.id){
                                 equal=1;
-                                System.out.println(parts[0]+" = " + player.id);
                             }
                         }
                     }
-
                 }while (equal == 1);
-
-
-                if (parts.length==0)System.out.println(randomAccessFile.getFilePointer());
-
-                sumPrice=sumPrice+ Integer.parseInt(parts[3]);
-
-                players[i] = new Player(Integer.parseInt(parts[0]),parts[1],Integer.parseInt(parts[2]),Integer.parseInt(parts[3]));
-
+                sumPrice=sumPrice+ tempPlayer.price;
+                players[i] = tempPlayer;
             }
 
         }while (sumPrice>budget);
@@ -161,5 +174,3 @@ public class Main {
 
     }
 }
-
-
